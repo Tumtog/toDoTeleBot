@@ -6,6 +6,7 @@ const {
   HttpError,
   InlineKeyboard,
 } = require("grammy");
+
 const logger = require("pino")();
 const pool = require("./database.js"); // Файл базы данных
 const bot = new Bot(process.env.BOT_API_KEY);
@@ -83,7 +84,6 @@ async function viewTasks(ctx) {
             .text("Изменить", `edit_${row.id}`)
             .text("Удалить", `delete_${row.id}`);
         }
-
         const taskMessage = await ctx.reply(content, {
           reply_markup: taskKeyboard,
         });

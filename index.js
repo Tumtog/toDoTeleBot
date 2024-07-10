@@ -6,11 +6,15 @@ const {
   HttpError,
   InlineKeyboard,
 } = require("grammy");
-
+const express = require('express');
 const logger = require("pino")();
 const pool = require("./database.js"); // Файл базы данных
 const bot = new Bot(process.env.BOT_API_KEY);
+// Создаем Express приложение
+const app = express();
 
+// Middleware для обработки JSON запросов
+app.use(express.json());
 // Хранение идентификаторов сообщений для каждого пользователя
 const userMessages = {};
 
@@ -240,6 +244,33 @@ bot.on("message:text", async (ctx) => {
 });
 
 // ======================================================================================================================
+
+
+// Обработчик вебхуков
+app.post("/webhook", (req, res) => {
+  bot.handleUpdate(req.body);
+  res.sendStatus(200);
+});
+
+// Устанавливаем вебхук
+const webhookUrl = process.env.WEBHOOK_URL; // Замените на переменную окружения для URL вебхука
+bot.api.setWebhook(webhookUrl).then(() => {
+  console.log(`Webhook set to ${webhookUrl}`);
+}).catch(err => {
+  console.error('Error setting webhook:', err);
+});
+
+// Запускаем сервер
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+// Обработка завершения работы
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+
 // Обработчик ошибок
 bot.catch((err) => {
   const ctx = err.ctx;
@@ -254,5 +285,3 @@ bot.catch((err) => {
     logger.error(`Неизвестная ошибка: ${e}`);
   }
 });
-
-bot.start();

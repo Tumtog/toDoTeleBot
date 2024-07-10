@@ -84,9 +84,8 @@ async function viewTasks(ctx) {
             .text("Изменить", `edit_${row.id}`)
             .text("Удалить", `delete_${row.id}`);
         }
-        const taskMessage = await ctx.reply(content, {
-          reply_markup: taskKeyboard,
-        });
+
+        const taskMessage = await ctx.reply(content, { reply_markup: taskKeyboard });
         userMessages[userId].push(taskMessage.message_id);
       }
     }
@@ -111,9 +110,8 @@ bot.command("start", (ctx) => {
 Каждая задача имеет следующие кнопки:<br>
 - "Сделано" / "Не сделано" для изменения статуса задачи.<br>
 - "Изменить" для редактирования задачи.<br>
-- "Удалить" для удаления задачи.`,
+- "Удалить" для удаления задачи.`),
     { parse_mode: "HTML" }
-  );
 });
 
 // Команда удалить все задачи
